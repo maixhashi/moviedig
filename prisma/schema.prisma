@@ -12,3 +12,63 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique @db.VarChar(150)
+  password  String   @db.VarChar(128)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  collectedRewards CollectedReward[]
+
+  @@index([username])
+  @@map("users")
+}
+
+model GuestUser {
+  id        String   @id @default(uuid())
+  username  String   @unique @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([username])
+  @@map("guest_users")
+}
+
+model MoviePoster {
+  id        Int      @id @default(autoincrement())
+  tmdbId    String   @unique @map("tmdb_id") @db.VarChar(255)
+  title     String   @db.VarChar(255)
+  posterUrl String   @map("poster_url") @db.VarChar(200)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  collectedRewards CollectedReward[]
+
+  @@map("movie_posters")
+}
+
+model RewardImage {
+  id            Int      @id @default(autoincrement())
+  tmdbId        String   @unique @map("tmdb_id") @db.VarChar(255)
+  title         String   @db.VarChar(255)
+  posterUrl     String   @map("poster_url")
+  moviePosterId Int?     @map("movie_poster_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@map("reward_images")
+}
+
+model CollectedReward {
+  id            Int      @id @default(autoincrement())
+  userId        Int      @map("user_id")
+  moviePosterId Int      @map("movie_poster_id")
+  collectedAt   DateTime @default(now()) @map("collected_at")
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  moviePoster MoviePoster @relation(fields: [moviePosterId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([moviePosterId])
+  @@map("collected_rewards")
+}
