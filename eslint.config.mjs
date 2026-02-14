@@ -5,7 +5,16 @@ import prettierConfig from "eslint-config-prettier";
 import customRules from "./eslint-rules/index.mjs";
 
 export default tseslint.config(
-  { ignores: [".next", "node_modules", "dist", "build", "coverage", "next-env.d.ts"] },
+  {
+    ignores: [
+      ".next",
+      "node_modules",
+      "dist",
+      "build",
+      "coverage",
+      "next-env.d.ts",
+    ],
+  },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],
@@ -21,7 +30,7 @@ export default tseslint.config(
     },
     plugins: {
       "@typescript-eslint": tseslint.plugin,
-      "custom": customRules,
+      custom: customRules,
     },
     rules: {
       // コーディング規約: any型の使用禁止
@@ -68,4 +77,3 @@ export default tseslint.config(
   },
   prettierConfig
 );
-

@@ -17,4 +17,3 @@ export default {
     "no-optional-type": noOptionalType,
   },
 };
-

@@ -10,7 +10,7 @@ on:
 jobs:
   lint-format-build:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -31,4 +31,3 @@ jobs:
 
       - name: Run build
         run: bun run build
-
