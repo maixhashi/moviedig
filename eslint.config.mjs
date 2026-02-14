@@ -54,6 +54,14 @@ export default tseslint.config(
       "custom/no-optional-chain": "error",
       // カスタムルール: else if禁止
       "custom/no-else-if": "error",
+      // カスタムルール: undefined型禁止
+      "custom/no-undefined-type": "error",
+      // カスタムルール: null型禁止
+      "custom/no-null-type": "error",
+      // カスタムルール: unknown型禁止
+      "custom/no-unknown-type": "error",
+      // カスタムルール: never型禁止
+      "custom/no-never-type": "error",
     },
   },
   prettierConfig
