@@ -16,6 +16,11 @@ export default defineConfig({
         process.env.NEXTAUTH_SECRET || "test-secret-key-for-vitest",
       NEXTAUTH_URL: process.env.NEXTAUTH_URL || "http://localhost:3000",
     },
+    server: {
+      deps: {
+        inline: ["next-auth"],
+      },
+    },
   },
   resolve: {
     alias: {
