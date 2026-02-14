@@ -2,6 +2,7 @@ import js from "@eslint/js";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 import prettierConfig from "eslint-config-prettier";
+import customRules from "./eslint-rules/index.mjs";
 
 export default tseslint.config(
   { ignores: [".next", "node_modules", "dist", "build", "coverage", "next-env.d.ts"] },
@@ -20,6 +21,7 @@ export default tseslint.config(
     },
     plugins: {
       "@typescript-eslint": tseslint.plugin,
+      "custom": customRules,
     },
     rules: {
       // コーディング規約: any型の使用禁止
@@ -48,6 +50,10 @@ export default tseslint.config(
           enforceConst: true,
         },
       ],
+      // カスタムルール: オプショナルチェーン禁止
+      "custom/no-optional-chain": "error",
+      // カスタムルール: else if禁止
+      "custom/no-else-if": "error",
     },
   },
   prettierConfig
