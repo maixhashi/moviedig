@@ -25,4 +25,3 @@ export type RegisterSuccessResponse = z.infer<
   typeof registerSuccessResponseSchema
 >;
 export type RegisterErrorResponse = z.infer<typeof registerErrorResponseSchema>;
-

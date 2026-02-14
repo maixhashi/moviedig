@@ -45,7 +45,10 @@ describe("POST /api/auth/register", () => {
     });
 
     const response = await POST(request);
-    const data = await parseResponseJson(response, registerSuccessResponseSchema);
+    const data = await parseResponseJson(
+      response,
+      registerSuccessResponseSchema
+    );
 
     expect(response.status).toBe(HTTP_STATUS.CREATED);
     expect(data.message).toBe("ユーザー登録が完了しました");
@@ -186,7 +189,9 @@ describe("POST /api/auth/register", () => {
     const data = await parseResponseJson(response, registerErrorResponseSchema);
 
     expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
-    expect(data.error).toBe("ユーザー登録は完了しましたが、自動ログインに失敗しました");
+    expect(data.error).toBe(
+      "ユーザー登録は完了しましたが、自動ログインに失敗しました"
+    );
     expect(signIn).toHaveBeenCalledWith("credentials", {
       username: "testuser",
       password: "password123",
@@ -194,4 +199,3 @@ describe("POST /api/auth/register", () => {
     });
   });
 });
-

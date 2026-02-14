@@ -22,4 +22,3 @@ export async function parseResponseJson<T extends z.ZodType>(
   const json = await response.json();
   return schema.parse(json);
 }
-
