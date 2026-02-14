@@ -6,8 +6,7 @@ const DAYS_IN_MONTH = 30;
 const HOURS_IN_DAY = 24;
 const MINUTES_IN_HOUR = 60;
 const SECONDS_IN_MINUTE = 60;
-const SESSION_MAX_AGE =
-  DAYS_IN_MONTH * HOURS_IN_DAY * MINUTES_IN_HOUR * SECONDS_IN_MINUTE;
+const SESSION_MAX_AGE = DAYS_IN_MONTH * HOURS_IN_DAY * MINUTES_IN_HOUR * SECONDS_IN_MINUTE;
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
