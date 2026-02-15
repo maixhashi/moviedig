@@ -8,10 +8,14 @@ const loginSchema = z.object({
   password: z.string(),
 });
 
-type Credentials = {
-  username: string;
-  password: string;
-};
+export type Credentials =
+  | {
+      username: string;
+      password: string;
+    }
+  | {
+      isGuest: true;
+    };
 
 type GuestCredentials = {
   isGuest: true;

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth, signOut } from "@/auth";
+import { prisma } from "@/lib/db/prisma";
 
 function handleUnauthorizedError() {
   return NextResponse.json(
@@ -20,11 +21,25 @@ function handleServerError(error: Error) {
   );
 }
 
+async function logoutGuestUser(guestUserId: string) {
+  try {
+    await prisma.guestUser.delete({
+      where: { id: guestUserId },
+    });
+  } catch (error) {
+    console.error("ゲストユーザー削除エラー:", error);
+  }
+}
+
 async function logoutUser() {
   const session = await auth();
 
   if (!session) {
     return handleUnauthorizedError();
+  }
+
+  if (session.user.isGuest === true) {
+    await logoutGuestUser(session.user.id);
   }
 
   try {
