@@ -8,8 +8,7 @@ export default {
     fixable: null,
     schema: [],
     messages: {
-      noOptionalChain:
-        "オプショナルチェーン（?.）の使用は禁止されています。",
+      noOptionalChain: "オプショナルチェーン（?.）の使用は禁止されています。",
     },
   },
   create(context) {
@@ -33,4 +32,3 @@ export default {
     };
   },
 };
-
