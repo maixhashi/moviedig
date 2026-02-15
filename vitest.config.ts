@@ -7,6 +7,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "node",
+    passWithNoTests: true,
     env: {
       DATABASE_URL:
         process.env.DATABASE_URL ||
