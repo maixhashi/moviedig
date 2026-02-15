@@ -3,7 +3,7 @@ import { ZodError, z } from "zod";
 import { registerSchema } from "@/lib/validation/user";
 import { hashPassword } from "@/lib/auth/password";
 import { prisma } from "@/lib/db/prisma";
-import { parseRequestJson } from "@/lib/utils/json-parse";
+import { parseRequestJson } from "@/lib/utils/jsonParse";
 import { signIn } from "@/auth";
 
 function handleZodError(error: ZodError) {

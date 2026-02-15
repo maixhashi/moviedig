@@ -5,8 +5,8 @@ import { prisma } from "@/lib/db/prisma";
 import {
   registerSuccessResponseSchema,
   registerErrorResponseSchema,
-} from "@/lib/validation/register-response";
-import { parseResponseJson } from "@/lib/utils/json-parse";
+} from "@/lib/validation/registerResponse";
+import { parseResponseJson } from "@/lib/utils/jsonParse";
 
 const HTTP_STATUS = {
   CREATED: 201,

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { GET } from "@/app/api/auth/is-guest-user/route";
 import { NextRequest } from "next/server";
-import { parseResponseJson } from "@/lib/utils/json-parse";
+import { parseResponseJson } from "@/lib/utils/jsonParse";
 import { z } from "zod";
 
 const HTTP_STATUS = {

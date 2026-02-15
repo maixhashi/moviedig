@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { GET } from "@/app/api/rewards/images/route";
 import { NextRequest } from "next/server";
-import { parseResponseJson } from "@/lib/utils/json-parse";
+import { parseResponseJson } from "@/lib/utils/jsonParse";
 import {
   rewardImagesSuccessResponseSchema,
   rewardImagesErrorResponseSchema,
-} from "@/lib/validation/reward-images-response";
+} from "@/lib/validation/rewardImagesResponse";
 
 const HTTP_STATUS = {
   OK: 200,
