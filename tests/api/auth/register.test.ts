@@ -35,10 +35,10 @@ describe("POST /api/auth/register", () => {
   it("正常系: ユーザー登録が成功し、自動ログインも成功する", async () => {
     const request = new NextRequest("http://localhost:3000/api/auth/register", {
       method: "POST",
-      body: JSON.stringify({
+      body: {
         username: "testuser",
         password: "password123",
-      }),
+      },
       headers: {
         "Content-Type": "application/json",
       },
@@ -65,10 +65,10 @@ describe("POST /api/auth/register", () => {
   it("異常系: ユーザー名が短すぎる", async () => {
     const request = new NextRequest("http://localhost:3000/api/auth/register", {
       method: "POST",
-      body: JSON.stringify({
+      body: {
         username: "ab",
         password: "password123",
-      }),
+      },
       headers: {
         "Content-Type": "application/json",
       },
@@ -86,10 +86,10 @@ describe("POST /api/auth/register", () => {
   it("異常系: パスワードが短すぎる", async () => {
     const request = new NextRequest("http://localhost:3000/api/auth/register", {
       method: "POST",
-      body: JSON.stringify({
+      body: {
         username: "testuser",
         password: "short",
-      }),
+      },
       headers: {
         "Content-Type": "application/json",
       },
@@ -107,10 +107,10 @@ describe("POST /api/auth/register", () => {
   it("異常系: ユーザー名に無効な文字が含まれている", async () => {
     const request = new NextRequest("http://localhost:3000/api/auth/register", {
       method: "POST",
-      body: JSON.stringify({
+      body: {
         username: "test-user",
         password: "password123",
-      }),
+      },
       headers: {
         "Content-Type": "application/json",
       },
@@ -135,10 +135,10 @@ describe("POST /api/auth/register", () => {
 
     const request = new NextRequest("http://localhost:3000/api/auth/register", {
       method: "POST",
-      body: JSON.stringify({
+      body: {
         username: "existinguser",
         password: "password123",
-      }),
+      },
       headers: {
         "Content-Type": "application/json",
       },
@@ -155,9 +155,9 @@ describe("POST /api/auth/register", () => {
   it("異常系: リクエストボディが不正", async () => {
     const request = new NextRequest("http://localhost:3000/api/auth/register", {
       method: "POST",
-      body: JSON.stringify({
+      body: {
         username: "testuser",
-      }),
+      },
       headers: {
         "Content-Type": "application/json",
       },
@@ -172,14 +172,15 @@ describe("POST /api/auth/register", () => {
   });
 
   it("異常系: ユーザー登録は成功したが、自動ログインに失敗する", async () => {
+    await prisma.user.deleteMany({});
     vi.mocked(signIn).mockRejectedValue(new Error("Sign in failed"));
 
     const request = new NextRequest("http://localhost:3000/api/auth/register", {
       method: "POST",
-      body: JSON.stringify({
+      body: {
         username: "testuser",
         password: "password123",
-      }),
+      },
       headers: {
         "Content-Type": "application/json",
       },
