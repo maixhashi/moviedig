@@ -104,11 +104,11 @@ describe("authorizeCredentials関数のテスト", () => {
 
     expect("error" in result1).toBe(false);
     expect("error" in result2).toBe(false);
-    
+
     if ("error" in result1 || "error" in result2) {
       return;
     }
-    
+
     expect(result1.id).not.toBe(result2.id);
     expect(result1.name).not.toBe(result2.name);
   });
@@ -119,20 +119,20 @@ describe("authorizeCredentials関数のテスト", () => {
     });
 
     expect("error" in result).toBe(false);
-    
+
     if ("error" in result) {
       return;
     }
-    
+
     const guestUser = await prisma.guestUser.findUnique({
       where: { id: result.id },
     });
     expect(guestUser).not.toBeNull();
-    
+
     if (!guestUser) {
       return;
     }
-    
+
     expect(guestUser.username).toBe(result.name);
   });
 });
