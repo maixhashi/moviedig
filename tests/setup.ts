@@ -33,7 +33,11 @@ vi.mock("next/server", () => ({
       this.url = url;
       const body = init.body;
       if (typeof body === "string") {
-        this.bodyData = EMPTY_OBJECT;
+        try {
+          this.bodyData = JSON.parse(body);
+        } catch {
+          this.bodyData = EMPTY_OBJECT;
+        }
       } else {
         this.bodyData = body || EMPTY_OBJECT;
       }

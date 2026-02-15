@@ -16,27 +16,23 @@ const HTTP_STATUS = {
   INTERNAL_SERVER_ERROR: 500,
 } as const;
 
-const mockAuth = vi.fn();
-const mockMoviePosterFindUnique = vi.fn();
-const mockCollectedRewardFindFirst = vi.fn();
-const mockCollectedRewardCreate = vi.fn();
-
 vi.mock("@/auth", () => ({
-  auth: mockAuth,
+  auth: vi.fn(),
 }));
 
 vi.mock("@/lib/db/prisma", () => ({
   prisma: {
     moviePoster: {
-      findUnique: mockMoviePosterFindUnique,
+      findUnique: vi.fn(),
     },
     collectedReward: {
-      findFirst: mockCollectedRewardFindFirst,
-      create: mockCollectedRewardCreate,
+      findFirst: vi.fn(),
+      create: vi.fn(),
     },
   },
 }));
 
+import { auth } from "@/auth";
 import { prisma } from "@/lib/db/prisma";
 
 describe("POST /api/rewards/collect", () => {
@@ -48,7 +44,7 @@ describe("POST /api/rewards/collect", () => {
     const mockUserId = 1;
     const mockMoviePosterId = 123;
 
-    mockAuth.mockResolvedValue({
+    vi.mocked(auth).mockResolvedValue({
       user: {
         id: String(mockUserId),
         name: "testuser",
@@ -56,7 +52,7 @@ describe("POST /api/rewards/collect", () => {
       expires: new Date().toISOString(),
     });
 
-    mockMoviePosterFindUnique.mockResolvedValue({
+    vi.mocked(prisma.moviePoster.findUnique).mockResolvedValue({
       id: mockMoviePosterId,
       tmdbId: "tmdb-123",
       title: "Test Movie",
@@ -65,9 +61,9 @@ describe("POST /api/rewards/collect", () => {
       updatedAt: new Date(),
     });
 
-    mockCollectedRewardFindFirst.mockResolvedValue(null);
+    vi.mocked(prisma.collectedReward.findFirst).mockResolvedValue(null);
 
-    mockCollectedRewardCreate.mockResolvedValue({
+    vi.mocked(prisma.collectedReward.create).mockResolvedValue({
       id: 1,
       userId: mockUserId,
       moviePosterId: mockMoviePosterId,
@@ -113,7 +109,7 @@ describe("POST /api/rewards/collect", () => {
   });
 
   it("異常系: 未認証ユーザーは報酬を収集できない", async () => {
-    mockAuth.mockResolvedValue(null);
+    (auth as any).mockResolvedValue(null);
 
     const request = new NextRequest(
       "http://localhost:3000/api/rewards/collect",
@@ -142,7 +138,7 @@ describe("POST /api/rewards/collect", () => {
   });
 
   it("異常系: セッションにuserが存在しない場合", async () => {
-    mockAuth.mockResolvedValue({
+    vi.mocked(auth).mockResolvedValue({
       expires: new Date().toISOString(),
     });
 
@@ -170,7 +166,7 @@ describe("POST /api/rewards/collect", () => {
   });
 
   it("異常系: セッションにuser.idが存在しない場合", async () => {
-    mockAuth.mockResolvedValue({
+    vi.mocked(auth).mockResolvedValue({
       user: {
         name: "testuser",
       },
@@ -201,7 +197,7 @@ describe("POST /api/rewards/collect", () => {
   });
 
   it("異常系: ユーザーIDが数値に変換できない場合", async () => {
-    mockAuth.mockResolvedValue({
+    vi.mocked(auth).mockResolvedValue({
       user: {
         id: "invalid-id",
         name: "testuser",
@@ -236,7 +232,7 @@ describe("POST /api/rewards/collect", () => {
     const mockUserId = 1;
     const mockMoviePosterId = 123;
 
-    mockAuth.mockResolvedValue({
+    vi.mocked(auth).mockResolvedValue({
       user: {
         id: String(mockUserId),
         name: "testuser",
@@ -244,7 +240,7 @@ describe("POST /api/rewards/collect", () => {
       expires: new Date().toISOString(),
     });
 
-    mockMoviePosterFindUnique.mockResolvedValue({
+    vi.mocked(prisma.moviePoster.findUnique).mockResolvedValue({
       id: mockMoviePosterId,
       tmdbId: "tmdb-123",
       title: "Test Movie",
@@ -253,7 +249,7 @@ describe("POST /api/rewards/collect", () => {
       updatedAt: new Date(),
     });
 
-    mockCollectedRewardFindFirst.mockResolvedValue({
+    vi.mocked(prisma.collectedReward.findFirst).mockResolvedValue({
       id: 1,
       userId: mockUserId,
       moviePosterId: mockMoviePosterId,
@@ -288,7 +284,7 @@ describe("POST /api/rewards/collect", () => {
     const mockUserId = 1;
     const mockMoviePosterId = 999;
 
-    mockAuth.mockResolvedValue({
+    vi.mocked(auth).mockResolvedValue({
       user: {
         id: String(mockUserId),
         name: "testuser",
@@ -296,7 +292,7 @@ describe("POST /api/rewards/collect", () => {
       expires: new Date().toISOString(),
     });
 
-    mockMoviePosterFindUnique.mockResolvedValue(null);
+    vi.mocked(prisma.moviePoster.findUnique).mockResolvedValue(null);
 
     const request = new NextRequest(
       "http://localhost:3000/api/rewards/collect",
@@ -326,7 +322,7 @@ describe("POST /api/rewards/collect", () => {
   it("異常系: バリデーションエラー（movie_poster_idが不正）", async () => {
     const mockUserId = 1;
 
-    mockAuth.mockResolvedValue({
+    vi.mocked(auth).mockResolvedValue({
       user: {
         id: String(mockUserId),
         name: "testuser",
@@ -365,7 +361,7 @@ describe("POST /api/rewards/collect", () => {
   it("異常系: バリデーションエラー（movie_poster_idが文字列）", async () => {
     const mockUserId = 1;
 
-    mockAuth.mockResolvedValue({
+    vi.mocked(auth).mockResolvedValue({
       user: {
         id: String(mockUserId),
         name: "testuser",
@@ -400,7 +396,7 @@ describe("POST /api/rewards/collect", () => {
   it("異常系: バリデーションエラー（movie_poster_idが欠如）", async () => {
     const mockUserId = 1;
 
-    mockAuth.mockResolvedValue({
+    vi.mocked(auth).mockResolvedValue({
       user: {
         id: String(mockUserId),
         name: "testuser",
@@ -434,7 +430,7 @@ describe("POST /api/rewards/collect", () => {
     const mockUserId = 1;
     const mockMoviePosterId = 123;
 
-    mockAuth.mockResolvedValue({
+    vi.mocked(auth).mockResolvedValue({
       user: {
         id: String(mockUserId),
         name: "testuser",
@@ -442,7 +438,7 @@ describe("POST /api/rewards/collect", () => {
       expires: new Date().toISOString(),
     });
 
-    mockMoviePosterFindUnique.mockRejectedValue(new Error("Database error"));
+    vi.mocked(prisma.moviePoster.findUnique).mockRejectedValue(new Error("Database error"));
 
     const request = new NextRequest(
       "http://localhost:3000/api/rewards/collect",

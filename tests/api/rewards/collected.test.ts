@@ -13,25 +13,22 @@ const HTTP_STATUS = {
   INTERNAL_SERVER_ERROR: 500,
 } as const;
 
-const mockAuth = vi.fn();
-const mockCollectedRewardFindMany = vi.fn();
-const mockRewardImageFindMany = vi.fn();
-
 vi.mock("@/auth", () => ({
-  auth: mockAuth,
+  auth: vi.fn(),
 }));
 
 vi.mock("@/lib/db/prisma", () => ({
   prisma: {
     collectedReward: {
-      findMany: mockCollectedRewardFindMany,
+      findMany: vi.fn(),
     },
     rewardImage: {
-      findMany: mockRewardImageFindMany,
+      findMany: vi.fn(),
     },
   },
 }));
 
+import { auth } from "@/auth";
 import { prisma } from "@/lib/db/prisma";
 
 describe("GET /api/rewards/collected", () => {
@@ -44,7 +41,7 @@ describe("GET /api/rewards/collected", () => {
     const mockMoviePosterId = 123;
     const mockCollectedAt = new Date("2024-01-01T00:00:00Z");
 
-    mockAuth.mockResolvedValue({
+    vi.mocked(auth).mockResolvedValue({
       user: {
         id: String(mockUserId),
         name: "testuser",
@@ -52,7 +49,7 @@ describe("GET /api/rewards/collected", () => {
       expires: new Date().toISOString(),
     });
 
-    mockCollectedRewardFindMany.mockResolvedValue([
+    vi.mocked(prisma.collectedReward.findMany).mockResolvedValue([
       {
         id: 1,
         userId: mockUserId,
@@ -67,7 +64,7 @@ describe("GET /api/rewards/collected", () => {
       },
     ]);
 
-    mockRewardImageFindMany.mockResolvedValue([
+    vi.mocked(prisma.rewardImage.findMany).mockResolvedValue([
       {
         id: 1,
         tmdbId: "tmdb-123",
@@ -123,7 +120,7 @@ describe("GET /api/rewards/collected", () => {
   it("正常系: 空のリストを返す", async () => {
     const mockUserId = 1;
 
-    mockAuth.mockResolvedValue({
+    vi.mocked(auth).mockResolvedValue({
       user: {
         id: String(mockUserId),
         name: "testuser",
@@ -131,7 +128,7 @@ describe("GET /api/rewards/collected", () => {
       expires: new Date().toISOString(),
     });
 
-    mockCollectedRewardFindMany.mockResolvedValue([]);
+    vi.mocked(prisma.collectedReward.findMany).mockResolvedValue([]);
 
     const request = new NextRequest(
       "http://localhost:3000/api/rewards/collected",
@@ -156,7 +153,7 @@ describe("GET /api/rewards/collected", () => {
     const mockMoviePosterId = 123;
     const mockCollectedAt = new Date("2024-01-01T00:00:00Z");
 
-    mockAuth.mockResolvedValue({
+    vi.mocked(auth).mockResolvedValue({
       user: {
         id: String(mockUserId),
         name: "testuser",
@@ -164,7 +161,7 @@ describe("GET /api/rewards/collected", () => {
       expires: new Date().toISOString(),
     });
 
-    mockCollectedRewardFindMany.mockResolvedValue([
+    vi.mocked(prisma.collectedReward.findMany).mockResolvedValue([
       {
         id: 1,
         userId: mockUserId,
@@ -179,7 +176,7 @@ describe("GET /api/rewards/collected", () => {
       },
     ]);
 
-    mockRewardImageFindMany.mockResolvedValue([]);
+    vi.mocked(prisma.rewardImage.findMany).mockResolvedValue([]);
 
     const request = new NextRequest(
       "http://localhost:3000/api/rewards/collected",
@@ -200,7 +197,7 @@ describe("GET /api/rewards/collected", () => {
   });
 
   it("異常系: 未認証ユーザーは一覧を取得できない", async () => {
-    mockAuth.mockResolvedValue(null);
+    vi.mocked(auth).mockResolvedValue(null);
 
     const request = new NextRequest(
       "http://localhost:3000/api/rewards/collected",
@@ -221,7 +218,7 @@ describe("GET /api/rewards/collected", () => {
   });
 
   it("異常系: セッションにuserが存在しない場合", async () => {
-    mockAuth.mockResolvedValue({
+    vi.mocked(auth).mockResolvedValue({
       expires: new Date().toISOString(),
     });
 
@@ -243,7 +240,7 @@ describe("GET /api/rewards/collected", () => {
   });
 
   it("異常系: セッションにuser.idが存在しない場合", async () => {
-    mockAuth.mockResolvedValue({
+    vi.mocked(auth).mockResolvedValue({
       user: {
         name: "testuser",
       },
@@ -268,7 +265,7 @@ describe("GET /api/rewards/collected", () => {
   });
 
   it("異常系: ユーザーIDが数値に変換できない場合", async () => {
-    mockAuth.mockResolvedValue({
+    vi.mocked(auth).mockResolvedValue({
       user: {
         id: "invalid-id",
         name: "testuser",
@@ -296,7 +293,7 @@ describe("GET /api/rewards/collected", () => {
   it("異常系: データベースエラーが発生した場合", async () => {
     const mockUserId = 1;
 
-    mockAuth.mockResolvedValue({
+    vi.mocked(auth).mockResolvedValue({
       user: {
         id: String(mockUserId),
         name: "testuser",
@@ -304,7 +301,7 @@ describe("GET /api/rewards/collected", () => {
       expires: new Date().toISOString(),
     });
 
-    mockCollectedRewardFindMany.mockRejectedValue(new Error("Database error"));
+    vi.mocked(prisma.collectedReward.findMany).mockRejectedValue(new Error("Database error"));
 
     const request = new NextRequest(
       "http://localhost:3000/api/rewards/collected",
