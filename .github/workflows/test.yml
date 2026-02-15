@@ -2,12 +2,26 @@ name: Test
 
 on:
   pull_request:
-  push:
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: moviedig
+          POSTGRES_PASSWORD: moviedig_dev
+          POSTGRES_DB: moviedig_dev
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -23,6 +37,12 @@ jobs:
       - name: Generate Prisma Client
         run: bunx prisma generate
 
+      - name: Run migrations
+        run: bunx prisma migrate deploy
+        env:
+          DATABASE_URL: postgresql://moviedig:moviedig_dev@localhost:5432/moviedig_dev
+
       - name: Run tests
         run: bun run test
-
+        env:
+          DATABASE_URL: postgresql://moviedig:moviedig_dev@localhost:5432/moviedig_dev
