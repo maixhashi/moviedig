@@ -14,21 +14,19 @@ const HTTP_STATUS = {
   INTERNAL_SERVER_ERROR: 500,
 } as const;
 
-const mockAuth = vi.fn();
-const mockFindUnique = vi.fn();
-
 vi.mock("@/auth", () => ({
-  auth: mockAuth,
+  auth: vi.fn(),
 }));
 
 vi.mock("@/lib/db/prisma", () => ({
   prisma: {
     user: {
-      findUnique: mockFindUnique,
+      findUnique: vi.fn(),
     },
   },
 }));
 
+import { auth } from "@/auth";
 import { prisma } from "@/lib/db/prisma";
 
 describe("GET /api/auth/current-user", () => {
@@ -41,7 +39,7 @@ describe("GET /api/auth/current-user", () => {
     const mockUsername = "testuser";
     const mockCreatedAt = new Date("2024-01-01T00:00:00Z");
 
-    mockAuth.mockResolvedValue({
+    vi.mocked(auth).mockResolvedValue({
       user: {
         id: String(mockUserId),
         name: mockUsername,
@@ -49,7 +47,7 @@ describe("GET /api/auth/current-user", () => {
       expires: new Date().toISOString(),
     });
 
-    mockFindUnique.mockResolvedValue({
+    vi.mocked(prisma.user.findUnique).mockResolvedValue({
       id: mockUserId,
       username: mockUsername,
       createdAt: mockCreatedAt,
@@ -71,7 +69,7 @@ describe("GET /api/auth/current-user", () => {
     expect(response.status).toBe(HTTP_STATUS.OK);
     expect(data.id).toBe(mockUserId);
     expect(data.username).toBe(mockUsername);
-    expect(data.created_at).toBe(mockCreatedAt.toISOString());
+    expect(data.createdAt).toBe(mockCreatedAt.toISOString());
     expect(prisma.user.findUnique).toHaveBeenCalledWith({
       where: { id: mockUserId },
       select: {
@@ -83,7 +81,7 @@ describe("GET /api/auth/current-user", () => {
   });
 
   it("異常系: 未認証ユーザーは情報を取得できない", async () => {
-    mockAuth.mockResolvedValue(null);
+    vi.mocked(auth).mockResolvedValue(null);
 
     const request = new NextRequest(
       "http://localhost:3000/api/auth/current-user",
@@ -104,7 +102,7 @@ describe("GET /api/auth/current-user", () => {
   });
 
   it("異常系: セッションにuserが存在しない場合", async () => {
-    mockAuth.mockResolvedValue({
+    vi.mocked(auth).mockResolvedValue({
       expires: new Date().toISOString(),
     });
 
@@ -127,7 +125,7 @@ describe("GET /api/auth/current-user", () => {
   });
 
   it("異常系: セッションにuser.idが存在しない場合", async () => {
-    mockAuth.mockResolvedValue({
+    vi.mocked(auth).mockResolvedValue({
       user: {
         name: "testuser",
       },
@@ -153,7 +151,7 @@ describe("GET /api/auth/current-user", () => {
   });
 
   it("異常系: ユーザーIDが数値に変換できない場合", async () => {
-    mockAuth.mockResolvedValue({
+    vi.mocked(auth).mockResolvedValue({
       user: {
         id: "invalid-id",
         name: "testuser",
@@ -182,7 +180,7 @@ describe("GET /api/auth/current-user", () => {
   it("異常系: データベースにユーザーが存在しない場合", async () => {
     const mockUserId = 999;
 
-    mockAuth.mockResolvedValue({
+    vi.mocked(auth).mockResolvedValue({
       user: {
         id: String(mockUserId),
         name: "nonexistent",
@@ -190,7 +188,7 @@ describe("GET /api/auth/current-user", () => {
       expires: new Date().toISOString(),
     });
 
-    mockFindUnique.mockResolvedValue(null);
+    vi.mocked(prisma.user.findUnique).mockResolvedValue(null);
 
     const request = new NextRequest(
       "http://localhost:3000/api/auth/current-user",
@@ -212,7 +210,7 @@ describe("GET /api/auth/current-user", () => {
   it("異常系: データベースエラーが発生した場合", async () => {
     const mockUserId = 1;
 
-    mockAuth.mockResolvedValue({
+    vi.mocked(auth).mockResolvedValue({
       user: {
         id: String(mockUserId),
         name: "testuser",
@@ -220,7 +218,7 @@ describe("GET /api/auth/current-user", () => {
       expires: new Date().toISOString(),
     });
 
-    mockFindUnique.mockRejectedValue(new Error("Database error"));
+    vi.mocked(prisma.user.findUnique).mockRejectedValue(new Error("Database error"));
 
     const request = new NextRequest(
       "http://localhost:3000/api/auth/current-user",

@@ -68,7 +68,7 @@ async function getCurrentUser() {
     {
       id: user.id,
       username: user.username,
-      created_at: user.createdAt.toISOString(),
+      createdAt: user.createdAt.toISOString(),
     },
     { status: 200 }
   );

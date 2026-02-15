@@ -3,7 +3,7 @@ import { z } from "zod";
 export const currentUserSuccessResponseSchema = z.object({
   id: z.number(),
   username: z.string(),
-  created_at: z.string().or(z.date()),
+  createdAt: z.string().or(z.date()),
 });
 
 export const currentUserErrorResponseSchema = z.object({
