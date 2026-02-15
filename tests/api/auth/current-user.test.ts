@@ -218,7 +218,9 @@ describe("GET /api/auth/current-user", () => {
       expires: new Date().toISOString(),
     });
 
-    vi.mocked(prisma.user.findUnique).mockRejectedValue(new Error("Database error"));
+    vi.mocked(prisma.user.findUnique).mockRejectedValue(
+      new Error("Database error")
+    );
 
     const request = new NextRequest(
       "http://localhost:3000/api/auth/current-user",
