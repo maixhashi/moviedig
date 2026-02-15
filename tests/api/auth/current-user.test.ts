@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { GET } from "@/app/api/auth/current-user/route";
 import { NextRequest } from "next/server";
-import { parseResponseJson } from "@/lib/utils/json-parse";
+import { parseResponseJson } from "@/lib/utils/jsonParse";
 import {
   currentUserSuccessResponseSchema,
   currentUserErrorResponseSchema,
-} from "@/lib/validation/current-user-response";
+} from "@/lib/validation/currentUserResponse";
 
 const HTTP_STATUS = {
   OK: 200,
