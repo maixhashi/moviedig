@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db/prisma";
 import { verifyPassword } from "@/lib/auth/password";
 import { z } from "zod";
+import { randomUUID } from "crypto";
 
 const loginSchema = z.object({
   username: z.string(),
@@ -12,9 +13,14 @@ type Credentials = {
   password: string;
 };
 
+type GuestCredentials = {
+  isGuest: true;
+};
+
 type AuthorizedUser = {
   id: string;
   name: string;
+  isGuest: boolean;
 };
 
 type AuthorizationError = {
@@ -24,8 +30,12 @@ type AuthorizationError = {
 type AuthorizationResult = AuthorizedUser | AuthorizationError;
 
 export async function authorizeCredentials(
-  credentials: Credentials
+  credentials: Credentials | GuestCredentials
 ): Promise<AuthorizationResult> {
+  if ("isGuest" in credentials && credentials.isGuest === true) {
+    return await authorizeGuest();
+  }
+
   const parsed = loginSchema.safeParse(credentials);
   if (!parsed.success) {
     return { error: "Invalid credentials" };
@@ -49,5 +59,28 @@ export async function authorizeCredentials(
   return {
     id: String(user.id),
     name: user.username,
+    isGuest: false,
   };
+}
+
+async function authorizeGuest(): Promise<AuthorizationResult> {
+  const guestId = randomUUID();
+  const username = `guest_${guestId}`;
+
+  try {
+    const guestUser = await prisma.guestUser.create({
+      data: {
+        id: guestId,
+        username,
+      },
+    });
+
+    return {
+      id: guestUser.id,
+      name: guestUser.username,
+      isGuest: true,
+    };
+  } catch {
+    return { error: "Failed to create guest user" };
+  }
 }
