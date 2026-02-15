@@ -16,4 +16,3 @@ export type CurrentUserSuccessResponse = z.infer<
 export type CurrentUserErrorResponse = z.infer<
   typeof currentUserErrorResponseSchema
 >;
-
