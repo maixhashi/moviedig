@@ -17,10 +17,7 @@ async function authorizeGuestUser() {
   return result;
 }
 
-async function authorizeRegularUser(
-  username: string,
-  password: string
-) {
+async function authorizeRegularUser(username: string, password: string) {
   const result = await authorizeCredentials({ username, password });
   if ("error" in result) {
     return null;

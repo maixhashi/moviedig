@@ -109,7 +109,7 @@ describe("POST /api/rewards/collect", () => {
   });
 
   it("異常系: 未認証ユーザーは報酬を収集できない", async () => {
-    (auth as any).mockResolvedValue(null);
+    vi.mocked(auth).mockResolvedValue(null);
 
     const request = new NextRequest(
       "http://localhost:3000/api/rewards/collect",
@@ -438,7 +438,9 @@ describe("POST /api/rewards/collect", () => {
       expires: new Date().toISOString(),
     });
 
-    vi.mocked(prisma.moviePoster.findUnique).mockRejectedValue(new Error("Database error"));
+    vi.mocked(prisma.moviePoster.findUnique).mockRejectedValue(
+      new Error("Database error")
+    );
 
     const request = new NextRequest(
       "http://localhost:3000/api/rewards/collect",

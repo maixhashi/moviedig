@@ -23,6 +23,30 @@ const EMPTY_OBJECT: JsonBody = {};
 const EMPTY_STRING = "";
 const EMPTY_HEADERS: HeadersInit = {};
 
+function validateJsonBody(parsed: JsonValue): parsed is JsonBody {
+  if (typeof parsed !== "object" || parsed === null) {
+    return false;
+  }
+  return !Array.isArray(parsed);
+}
+
+function parseJsonBodyInternal(body: string): JsonBody {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const parsed = JSON.parse(body);
+  if (!validateJsonBody(parsed)) {
+    return EMPTY_OBJECT;
+  }
+  return parsed;
+}
+
+function parseJsonBody(body: string): JsonBody {
+  try {
+    return parseJsonBodyInternal(body);
+  } catch {
+    return EMPTY_OBJECT;
+  }
+}
+
 vi.mock("next/server", () => ({
   NextRequest: class {
     url: string;
@@ -33,11 +57,7 @@ vi.mock("next/server", () => ({
       this.url = url;
       const body = init.body;
       if (typeof body === "string") {
-        try {
-          this.bodyData = JSON.parse(body);
-        } catch {
-          this.bodyData = EMPTY_OBJECT;
-        }
+        this.bodyData = parseJsonBody(body);
       } else {
         this.bodyData = body || EMPTY_OBJECT;
       }

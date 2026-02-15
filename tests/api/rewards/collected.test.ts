@@ -301,7 +301,9 @@ describe("GET /api/rewards/collected", () => {
       expires: new Date().toISOString(),
     });
 
-    vi.mocked(prisma.collectedReward.findMany).mockRejectedValue(new Error("Database error"));
+    vi.mocked(prisma.collectedReward.findMany).mockRejectedValue(
+      new Error("Database error")
+    );
 
     const request = new NextRequest(
       "http://localhost:3000/api/rewards/collected",
