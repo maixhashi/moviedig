@@ -23,7 +23,16 @@ vi.mock("@/auth", () => ({
   signOut: vi.fn(),
 }));
 
+vi.mock("@/lib/db/prisma", () => ({
+  prisma: {
+    guestUser: {
+      delete: vi.fn(),
+    },
+  },
+}));
+
 import { auth, signOut } from "@/auth";
+import { prisma } from "@/lib/db/prisma";
 
 describe("POST /api/auth/logout", () => {
   beforeEach(() => {
@@ -86,5 +95,67 @@ describe("POST /api/auth/logout", () => {
 
     expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
     expect(data.error).toBe("サーバーエラーが発生しました");
+  });
+
+  it("正常系: ゲストユーザーがログアウトできる（GuestUserレコードも削除される）", async () => {
+    const guestUserId = "guest-uuid-123";
+    vi.mocked(auth).mockResolvedValue({
+      user: {
+        id: guestUserId,
+        name: "guest_xxxxx",
+        isGuest: true,
+      },
+      expires: new Date().toISOString(),
+    });
+    vi.mocked(signOut).mockResolvedValue(undefined);
+    vi.mocked(prisma.guestUser.delete).mockResolvedValue({
+      id: guestUserId,
+      username: "guest_xxxxx",
+      createdAt: new Date(),
+    });
+
+    const request = new NextRequest("http://localhost:3000/api/auth/logout", {
+      method: "POST",
+    });
+
+    const response = await POST(request);
+    const data = await parseResponseJson(response, logoutSuccessResponseSchema);
+
+    expect(response.status).toBe(HTTP_STATUS.OK);
+    expect(data.message).toBe("ログアウトしました");
+    expect(signOut).toHaveBeenCalledWith({ redirect: false });
+    expect(prisma.guestUser.delete).toHaveBeenCalledWith({
+      where: { id: guestUserId },
+    });
+  });
+
+  it("正常系: ゲストユーザー削除エラーが発生してもログアウトは成功する", async () => {
+    const guestUserId = "guest-uuid-123";
+    vi.mocked(auth).mockResolvedValue({
+      user: {
+        id: guestUserId,
+        name: "guest_xxxxx",
+        isGuest: true,
+      },
+      expires: new Date().toISOString(),
+    });
+    vi.mocked(signOut).mockResolvedValue(undefined);
+    vi.mocked(prisma.guestUser.delete).mockRejectedValue(
+      new Error("Delete failed")
+    );
+
+    const request = new NextRequest("http://localhost:3000/api/auth/logout", {
+      method: "POST",
+    });
+
+    const response = await POST(request);
+    const data = await parseResponseJson(response, logoutSuccessResponseSchema);
+
+    expect(response.status).toBe(HTTP_STATUS.OK);
+    expect(data.message).toBe("ログアウトしました");
+    expect(signOut).toHaveBeenCalledWith({ redirect: false });
+    expect(prisma.guestUser.delete).toHaveBeenCalledWith({
+      where: { id: guestUserId },
+    });
   });
 });
